@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { Drawer as DrawerPrimitive } from "vaul"
-import { Tooltip } from "recharts"
+import { Tooltip, type TooltipProps } from "recharts"
 
 import { cn } from "@/lib/utils"
 
@@ -106,15 +106,32 @@ const DrawerDescription = React.forwardRef<
 DrawerDescription.displayName = DrawerPrimitive.Description.displayName
 
 // Components for Charts
-const ChartContainer = ({
-  className,
-  ...props
-}: React.ComponentProps<"div">) => (
-  <div
-    className={cn("flex w-full items-center justify-center", className)}
-    {...props}
-  />
-)
+type ChartContainerProps = React.ComponentProps<"div"> & {
+  config: ChartConfig
+}
+
+const ChartContainer = React.forwardRef<
+  HTMLDivElement,
+  ChartContainerProps
+>(({ config, className, children, ...props }, ref) => {
+  const id = React.useId()
+  const style = React.useMemo(() => {
+    return Object.entries(config).map(([key, value]) => {
+      return value.color ? `.${id} .recharts-bar-${key} { fill: ${value.color}; }` : ""
+    }).join("\n")
+  }, [config, id])
+
+  return (
+    <div
+      ref={ref}
+      className={cn(id, "flex w-full items-center justify-center", className)}
+      {...props}
+    >
+      <style dangerouslySetInnerHTML={{ __html: style }} />
+      {children}
+    </div>
+  )
+})
 ChartContainer.displayName = "ChartContainer"
 
 const ChartStyle = ({
@@ -168,7 +185,41 @@ const ChartLegendContent = ({
 ChartLegendContent.displayName = "ChartLegendContent"
 
 const ChartTooltip = Tooltip
-const ChartTooltipContent = Tooltip.Content
+
+const ChartTooltipContent = React.forwardRef<
+  HTMLDivElement,
+  TooltipProps<any, any> & React.ComponentProps<"div">
+>(({ active, payload, label, className }, ref) => {
+  if (!active || !payload || payload.length === 0) {
+    return null
+  }
+
+  return (
+    <div
+      ref={ref}
+      className={cn(
+        "grid min-w-[8rem] items-start gap-1.5 rounded-lg border bg-background p-2.5 text-sm shadow-xl",
+        className
+      )}
+    >
+      <div className="font-medium">{label}</div>
+      <div className="grid gap-1.5">
+        {payload.map((item, index) => (
+          <div
+            key={index}
+            className="flex items-center gap-2"
+          >
+            <div className="flex flex-col">
+              <span className="font-medium text-muted-foreground">{item.name}</span>
+              <span className="font-bold">{item.value}</span>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+})
+ChartTooltipContent.displayName = "ChartTooltipContent"
 
 type ChartConfig = {
   [key: string]: {

@@ -1079,20 +1079,20 @@ export default function DumboFitApp() {
             <div className="space-y-4">
               <div className={`${card} rounded-3xl p-6 shadow-xl`}>
                 <h2 className={`text-xl font-bold ${txt} mb-4`}>Consumo de Calorias (Últimos dias)</h2>
-                <div className="h-64">
-                  <ResponsiveContainer width="100%" height="100%">
+                <ChartContainer config={chartConfig} className="h-64 w-full">
+                  <ResponsiveContainer>
                     <BarChart data={chartData}>
                       <CartesianGrid vertical={false} strokeDasharray="3 3" />
                       <XAxis dataKey="date" tick={{ fill: dark ? '#9ca3af' : '#6b7280', fontSize: 12 }} />
                       <YAxis tick={{ fill: dark ? '#9ca3af' : '#6b7280', fontSize: 12 }} />
                       <ChartTooltip
                         cursor={false}
-                        content={<ChartTooltipContent indicator="dot" />}
+                        content={<ChartTooltipContent />}
                       />
-                      <Bar dataKey="calories" fill="var(--color-calories)" radius={4} />
+                      <Bar dataKey="calories" name="Calorias" radius={4} />
                     </BarChart>
                   </ResponsiveContainer>
-                </div>
+                </ChartContainer>
               </div>
             </div>
           )}
