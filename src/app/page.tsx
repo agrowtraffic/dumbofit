@@ -1,12 +1,15 @@
 "use client";
 import React, { useState, useEffect, useMemo } from 'react';
-import { Home, Camera, User, TrendingUp, BookOpen, Plus, Mail, Lock, Trophy, Flame, Crown, Zap, Bell, ChevronLeft, Settings, X, Moon, Sun, Share2, History, Users, Trash2, Clock } from 'lucide-react';
+import { Home, Camera, User, TrendingUp, BookOpen, Plus, Mail, Lock, Trophy, Flame, Crown, Zap, Bell, ChevronLeft, Settings, X, Moon, Sun, Share2, History, Users, Trash2, Clock, Weight, Activity } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { Auth } from '@supabase/auth-ui-react';
 import { ThemeSupa } from '@supabase/auth-ui-shared';
 import type { AuthChangeEvent, Session } from '@supabase/supabase-js';
-import { Bar, BarChart, CartesianGrid, XAxis, YAxis, ResponsiveContainer } from 'recharts';
-import { ChartContainer, ChartTooltip, ChartTooltipContent, type ChartConfig } from '@/components/ui/chart';
+
+import { StatCard } from '@/components/dashboard/StatCard';
+import { MacroChart } from '@/components/dashboard/MacroChart';
+import { WeightChart } from '@/components/dashboard/WeightChart';
+import { CalorieChart } from '@/components/dashboard/CalorieChart';
 
 export default function DumboFitApp() {
   const [screen, setScreen] = useState('welcome');
@@ -23,6 +26,7 @@ export default function DumboFitApp() {
   const [dark, setDark] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
   const [history, setHistory] = useState<any[]>([]);
+  const [weightHistory, setWeightHistory] = useState<any[]>([]);
   const [water, setWater] = useState(1.2);
   const [recipe, setRecipe] = useState<any | null>(null);
   const [quizStep, setQuizStep] = useState(0);
@@ -56,17 +60,27 @@ export default function DumboFitApp() {
 
   useEffect(() => {
     const today = new Date();
-    const yesterday = new Date(today);
-    yesterday.setDate(yesterday.getDate() - 1);
-    const twoDaysAgo = new Date(today);
-    twoDaysAgo.setDate(twoDaysAgo.getDate() - 2);
+    const d1 = new Date(today); d1.setDate(d1.getDate() - 1);
+    const d2 = new Date(today); d2.setDate(d2.getDate() - 2);
+    const d3 = new Date(today); d3.setDate(d3.getDate() - 3);
+    const d4 = new Date(today); d4.setDate(d4.getDate() - 4);
 
     setHistory([
-      { id: 1, name: 'Salada Caesar Frango', cal: 420, prot: 28, date: today.toLocaleDateString('pt-BR'), time: '12:30', photo: '🥗' },
-      { id: 4, name: 'Iogurte com Frutas', cal: 250, prot: 15, date: today.toLocaleDateString('pt-BR'), time: '09:00', photo: '🍓' },
-      { id: 2, name: 'Smoothie Frutas', cal: 180, prot: 8, date: yesterday.toLocaleDateString('pt-BR'), time: '09:15', photo: '🥤' },
-      { id: 5, name: 'Frango Grelhado', cal: 600, prot: 45, date: yesterday.toLocaleDateString('pt-BR'), time: '20:00', photo: '🍗' },
-      { id: 3, name: 'Salmão Legumes', cal: 520, prot: 35, date: twoDaysAgo.toLocaleDateString('pt-BR'), time: '19:45', photo: '🐟' }
+      { id: 1, name: 'Salada Caesar Frango', cal: 420, prot: 40, carb: 10, fat: 25, date: today.toLocaleDateString('pt-BR'), time: '12:30', photo: '🥗' },
+      { id: 4, name: 'Iogurte com Frutas', cal: 250, prot: 15, carb: 30, fat: 8, date: today.toLocaleDateString('pt-BR'), time: '09:00', photo: '🍓' },
+      { id: 2, name: 'Smoothie Frutas', cal: 180, prot: 8, carb: 35, fat: 2, date: d1.toLocaleDateString('pt-BR'), time: '09:15', photo: '🥤' },
+      { id: 5, name: 'Frango Grelhado', cal: 600, prot: 50, carb: 5, fat: 40, date: d1.toLocaleDateString('pt-BR'), time: '20:00', photo: '🍗' },
+      { id: 3, name: 'Salmão Legumes', cal: 520, prot: 45, carb: 20, fat: 30, date: d2.toLocaleDateString('pt-BR'), time: '19:45', photo: '🐟' },
+      { id: 6, name: 'Aveia com Banana', cal: 350, prot: 12, carb: 60, fat: 8, date: d3.toLocaleDateString('pt-BR'), time: '08:00', photo: '🥣' },
+      { id: 7, name: 'Bife com Batata Doce', cal: 700, prot: 55, carb: 40, fat: 35, date: d4.toLocaleDateString('pt-BR'), time: '13:00', photo: '🥩' },
+    ]);
+
+    setWeightHistory([
+      { date: d4.toLocaleDateString('pt-BR'), weight: 65.5 },
+      { date: d3.toLocaleDateString('pt-BR'), weight: 65.2 },
+      { date: d2.toLocaleDateString('pt-BR'), weight: 65.3 },
+      { date: d1.toLocaleDateString('pt-BR'), weight: 65.0 },
+      { date: today.toLocaleDateString('pt-BR'), weight: 64.8 },
     ]);
   }, []);
 
@@ -86,6 +100,15 @@ export default function DumboFitApp() {
     })).reverse();
   }, [history]);
 
+  const macroData = useMemo(() => {
+    return history.reduce((acc, item) => {
+      acc.prot += item.prot;
+      acc.carb += item.carb;
+      acc.fat += item.fat;
+      return acc;
+    }, { prot: 0, carb: 0, fat: 0 });
+  }, [history]);
+
   const KEY = process.env.NEXT_PUBLIC_GEMINI_API_KEY;
   
   const user = { 
@@ -94,7 +117,7 @@ export default function DumboFitApp() {
     xp: 2450, 
     nextXp: 3000, 
     streak: 15, 
-    weight: parseInt(quizData.weight) || 55, 
+    weight: parseInt(quizData.weight) || 64.8, 
     height: parseInt(quizData.height) || 165,
     age: parseInt(quizData.age) || 28,
     goal: quizData.goal || 'improve_health',
@@ -1098,23 +1121,13 @@ export default function DumboFitApp() {
           {/* Tab: Stats */}
           {tab === 'stats' && (
             <div className="space-y-4">
-              <div className={`${card} rounded-3xl p-6 shadow-xl`}>
-                <h2 className={`text-xl font-bold ${txt} mb-4`}>Consumo de Calorias (Últimos dias)</h2>
-                <ChartContainer config={chartConfig} className="h-64 w-full">
-                  <ResponsiveContainer>
-                    <BarChart data={chartData}>
-                      <CartesianGrid vertical={false} strokeDasharray="3 3" />
-                      <XAxis dataKey="date" tick={{ fill: dark ? '#9ca3af' : '#6b7280', fontSize: 12 }} />
-                      <YAxis tick={{ fill: dark ? '#9ca3af' : '#6b7280', fontSize: 12 }} />
-                      <ChartTooltip
-                        cursor={false}
-                        content={<ChartTooltipContent />}
-                      />
-                      <Bar dataKey="calories" name="Calorias" radius={4} />
-                    </BarChart>
-                  </ResponsiveContainer>
-                </ChartContainer>
+              <div className="grid grid-cols-2 gap-4">
+                <StatCard title="Média de Calorias" value={((history.reduce((a, b) => a + b.cal, 0) / 5) || 0).toFixed(0)} icon={Flame} description="Média dos últimos 5 dias" />
+                <StatCard title="Variação de Peso" value={`${(weightHistory[weightHistory.length - 1]?.weight - weightHistory[0]?.weight).toFixed(1)} kg`} icon={Weight} description="Desde o início" />
               </div>
+              <MacroChart data={macroData} />
+              <WeightChart data={weightHistory} />
+              <CalorieChart data={chartData} />
             </div>
           )}
 
