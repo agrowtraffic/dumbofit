@@ -1001,5 +1001,222 @@ export default function DumboFitApp() {
               </div>
 
               {/* Circular Progress - Calorias Principal */}
-              <div className={`${card} rounded-3xl p-6 shadow-xl bg-gradient-to-br from-b
-... [arquivo truncado por segurança]
+              <div className={`${card} rounded-3xl p-6 shadow-xl bg-gradient-to-br from-blue-50 to-purple-50`}>
+                <div className="relative w-48 h-48 mx-auto">
+                  <svg className="w-full h-full" viewBox="0 0 36 36">
+                    <path
+                      className="text-gray-200"
+                      d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="3"
+                    />
+                    <path
+                      className="text-blue-600"
+                      strokeDasharray={`${(user.cal / user.goal_calories) * 100}, 100`}
+                      d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="3"
+                      strokeLinecap="round"
+                    />
+                  </svg>
+                  <div className="absolute inset-0 flex flex-col items-center justify-center">
+                    <span className="text-4xl font-black text-blue-600">{user.cal}</span>
+                    <span className="text-gray-500">calorias</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Water Tracker */}
+              <div className={`${card} rounded-3xl p-6 shadow-xl`}>
+                <h3 className={`font-bold ${txt} mb-4`}>💧 Hidratação (L)</h3>
+                <div className="flex items-center justify-between">
+                  <button onClick={() => setWater(w => Math.max(0, w - 0.2))} className="w-12 h-12 bg-gray-100 rounded-full text-2xl font-bold text-gray-600">-</button>
+                  <span className={`text-4xl font-black ${txt}`}>{water.toFixed(1)}L</span>
+                  <button onClick={() => setWater(w => w + 0.2)} className="w-12 h-12 bg-blue-500 rounded-full text-2xl font-bold text-white">+</button>
+                </div>
+              </div>
+
+              {/* Weekly Challenge */}
+              <div className={`${card} rounded-3xl p-6 shadow-xl`}>
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className={`font-bold ${txt}`}>{challenge.icon} {challenge.title}</h3>
+                  <span className="text-yellow-500 font-bold">+{challenge.reward} XP</span>
+                </div>
+                <p className={`${txt2} text-sm mb-2`}>{challenge.desc}</p>
+                <div className="w-full bg-gray-200 rounded-full h-2.5">
+                  <div className="bg-yellow-500 h-2.5 rounded-full" style={{ width: `${(challenge.prog / challenge.total) * 100}%` }}></div>
+                </div>
+                <p className={`text-right text-sm ${txt2} mt-1`}>{challenge.prog}/{challenge.total}</p>
+              </div>
+
+              {/* Meal History */}
+              <div className={`${card} rounded-3xl p-6 shadow-xl`}>
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className={`font-bold ${txt}`}>Histórico de Refeições</h3>
+                  <button onClick={() => setShowHistory(true)} className={`text-sm font-semibold text-blue-600`}>Ver tudo</button>
+                </div>
+                <div className="space-y-3">
+                  {history.slice(0, 2).map(item => (
+                    <div key={item.id} className="flex items-center gap-3">
+                      <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center text-2xl">{item.photo}</div>
+                      <div className="flex-1">
+                        <p className={`font-semibold ${txt}`}>{item.name}</p>
+                        <p className={`text-sm ${txt2}`}>{item.time}</p>
+                      </div>
+                      <p className={`font-bold ${txt}`}>{item.cal} cal</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Tab: Stats */}
+          {tab === 'stats' && (
+            <div className="space-y-4">
+              <div className={`${card} rounded-3xl p-6 shadow-xl`}>
+                <h2 className={`text-xl font-bold ${txt} mb-4`}>Consumo de Calorias (Últimos dias)</h2>
+                <div className="h-64">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={chartData}>
+                      <CartesianGrid vertical={false} strokeDasharray="3 3" />
+                      <XAxis dataKey="date" tick={{ fill: dark ? '#9ca3af' : '#6b7280', fontSize: 12 }} />
+                      <YAxis tick={{ fill: dark ? '#9ca3af' : '#6b7280', fontSize: 12 }} />
+                      <ChartTooltip
+                        cursor={false}
+                        content={<ChartTooltipContent indicator="dot" />}
+                      />
+                      <Bar dataKey="calories" fill="var(--color-calories)" radius={4} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Tab: Recipes */}
+          {tab === 'recipes' && (
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <h2 className={`text-xl font-bold ${txt}`}>Minhas Receitas</h2>
+                <button onClick={() => setShowRecipeGen(true)} className="bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold">Gerar Nova</button>
+              </div>
+              {recipes.length > 0 ? (
+                recipes.map(r => (
+                  <div key={r.id} onClick={() => setRecipe(r)} className={`${card} p-4 rounded-2xl flex items-center gap-4 cursor-pointer`}>
+                    <div className="w-16 h-16 bg-gray-100 rounded-xl flex items-center justify-center text-3xl">{r.emoji}</div>
+                    <div>
+                      <h3 className={`font-bold ${txt}`}>{r.name}</h3>
+                      <p className={`${txt2} text-sm`}>{r.calories} cal • {r.time} min</p>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div className={`${card} p-8 rounded-2xl text-center`}>
+                  <p className={txt2}>Você ainda não gerou nenhuma receita.</p>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Tab: Profile */}
+          {tab === 'profile' && (
+            <div className="space-y-4">
+              <div className={`${card} rounded-3xl p-6 shadow-xl`}>
+                <div className="text-center mb-6">
+                  <div className="w-24 h-24 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-xl">
+                    <User size={48} className="text-white" />
+                  </div>
+                  <h1 className={`text-3xl font-black ${txt} mb-2`}>{user.name}</h1>
+                  <p className={`${txt2}`}>Membro desde {user.date}</p>
+                </div>
+                
+                <div className="grid grid-cols-3 gap-4 mb-6">
+                  <div className="text-center">
+                    <div className="bg-gradient-to-br from-blue-100 to-blue-200 p-4 rounded-2xl mb-2">
+                      <Trophy className="text-blue-600 mx-auto mb-1" size={24} />
+                      <p className="text-2xl font-black text-blue-600">{user.level}</p>
+                    </div>
+                    <p className={`text-sm ${txt2}`}>Nível</p>
+                  </div>
+                  
+                  <div className="text-center">
+                    <div className="bg-gradient-to-br from-orange-100 to-orange-200 p-4 rounded-2xl mb-2">
+                      <Flame className="text-orange-600 mx-auto mb-1" size={24} />
+                      <p className="text-2xl font-black text-orange-600">{user.streak}</p>
+                    </div>
+                    <p className={`text-sm ${txt2}`}>Sequência</p>
+                  </div>
+                  
+                  <div className="text-center">
+                    <div className="bg-gradient-to-br from-purple-100 to-purple-200 p-4 rounded-2xl mb-2">
+                      <Crown className="text-purple-600 mx-auto mb-1" size={24} />
+                      <p className="text-2xl font-black text-purple-600">{user.badges}</p>
+                    </div>
+                    <p className={`text-sm ${txt2}`}>Conquistas</p>
+                  </div>
+                </div>
+                
+                <div className="space-y-4 mb-6">
+                  <div className="flex justify-between items-center">
+                    <span className={txt2}>Peso atual</span>
+                    <span className={`font-bold ${txt}`}>{user.weight} kg</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className={txt2}>Altura</span>
+                    <span className={`font-bold ${txt}`}>{user.height} cm</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className={txt2}>IMC</span>
+                    <span className={`font-bold ${txt}`}>{imc}</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className={txt2}>Refeições registradas</span>
+                    <span className={`font-bold ${txt}`}>{user.meals}</span>
+                  </div>
+                </div>
+                
+                <button 
+                  onClick={() => setShowSettings(true)} 
+                  className="w-full bg-gray-200 text-gray-800 py-4 rounded-2xl font-bold hover:bg-gray-300 transition-all flex items-center justify-center gap-2"
+                >
+                  <Settings size={20} />
+                  Configurações
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Bottom Nav Bar */}
+        <div className="fixed bottom-0 left-0 right-0 bg-white/80 backdrop-blur-lg border-t border-gray-200 p-2 shadow-t-2xl">
+          <div className="flex justify-around items-center max-w-md mx-auto">
+            <button onClick={() => setTab('home')} className={`flex flex-col items-center gap-1 p-2 rounded-lg transition-all ${tab === 'home' ? 'text-blue-600' : 'text-gray-500'}`}>
+              <Home size={24} />
+              <span className="text-xs font-bold">Início</span>
+            </button>
+            <button onClick={() => setTab('stats')} className={`flex flex-col items-center gap-1 p-2 rounded-lg transition-all ${tab === 'stats' ? 'text-blue-600' : 'text-gray-500'}`}>
+              <TrendingUp size={24} />
+              <span className="text-xs font-bold">Stats</span>
+            </button>
+            <button onClick={() => setShowCamera(true)} className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center shadow-lg -mt-8 border-4 border-white">
+              <Camera size={28} className="text-white" />
+            </button>
+            <button onClick={() => setTab('recipes')} className={`flex flex-col items-center gap-1 p-2 rounded-lg transition-all ${tab === 'recipes' ? 'text-blue-600' : 'text-gray-500'}`}>
+              <BookOpen size={24} />
+              <span className="text-xs font-bold">Receitas</span>
+            </button>
+            <button onClick={() => setTab('profile')} className={`flex flex-col items-center gap-1 p-2 rounded-lg transition-all ${tab === 'profile' ? 'text-blue-600' : 'text-gray-500'}`}>
+              <User size={24} />
+              <span className="text-xs font-bold">Perfil</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return null;
+}
