@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect, useMemo } from 'react';
 import { Home, Camera, User, TrendingUp, BookOpen, Plus, Mail, Lock, Trophy, Flame, Crown, Zap, Bell, ChevronLeft, Settings, X, Moon, Sun, Share2, History, Users, Trash2, Clock } from 'lucide-react';
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { supabase } from '@/lib/supabase';
 import { Auth } from '@supabase/auth-ui-react';
 import { ThemeSupa } from '@supabase/auth-ui-shared';
 import type { AuthChangeEvent, Session } from '@supabase/supabase-js';
@@ -40,8 +40,6 @@ export default function DumboFitApp() {
     bedTime: ''
   });
 
-  const supabase = createClientComponentClient();
-
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event: AuthChangeEvent, session: Session | null) => {
       if (event === 'SIGNED_IN') {
@@ -54,7 +52,7 @@ export default function DumboFitApp() {
     });
 
     return () => subscription.unsubscribe();
-  }, [supabase.auth]);
+  }, []);
 
 
   const KEY = 'YOUR_API_KEY'; // Substitua pela sua chave de API do Google AI
