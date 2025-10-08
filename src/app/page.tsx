@@ -900,8 +900,15 @@ export default function DumboFitApp() {
       },
     } satisfies ChartConfig;
 
+    const navItems = [
+      { id: 'home', label: 'Início', icon: Home },
+      { id: 'stats', label: 'Stats', icon: TrendingUp },
+      { id: 'recipes', label: 'Receitas', icon: BookOpen },
+      { id: 'profile', label: 'Perfil', icon: User },
+    ];
+
     return (
-      <div className={`min-h-screen ${bg} pb-24`}>
+      <div className={`min-h-screen ${bg} pb-28`}>
         {/* Header */}
         <div className={`${card} rounded-b-3xl p-4 shadow-lg mb-4`}>
           <div className="flex items-center justify-between mb-4">
@@ -1206,26 +1213,34 @@ export default function DumboFitApp() {
         </div>
 
         {/* Bottom Nav Bar */}
-        <div className="fixed bottom-0 left-0 right-0 bg-white/80 backdrop-blur-lg border-t border-gray-200 p-2 shadow-t-2xl">
-          <div className="flex justify-around items-center max-w-md mx-auto">
-            <button onClick={() => setTab('home')} className={`flex flex-col items-center gap-1 p-2 rounded-lg transition-all ${tab === 'home' ? 'text-blue-600' : 'text-gray-500'}`}>
-              <Home size={24} />
-              <span className="text-xs font-bold">Início</span>
-            </button>
-            <button onClick={() => setTab('stats')} className={`flex flex-col items-center gap-1 p-2 rounded-lg transition-all ${tab === 'stats' ? 'text-blue-600' : 'text-gray-500'}`}>
-              <TrendingUp size={24} />
-              <span className="text-xs font-bold">Stats</span>
-            </button>
-            <button onClick={() => setShowCamera(true)} className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center shadow-lg -mt-8 border-4 border-white">
-              <Camera size={28} className="text-white" />
-            </button>
-            <button onClick={() => setTab('recipes')} className={`flex flex-col items-center gap-1 p-2 rounded-lg transition-all ${tab === 'recipes' ? 'text-blue-600' : 'text-gray-500'}`}>
-              <BookOpen size={24} />
-              <span className="text-xs font-bold">Receitas</span>
-            </button>
-            <button onClick={() => setTab('profile')} className={`flex flex-col items-center gap-1 p-2 rounded-lg transition-all ${tab === 'profile' ? 'text-blue-600' : 'text-gray-500'}`}>
-              <User size={24} />
-              <span className="text-xs font-bold">Perfil</span>
+        <div className="fixed bottom-4 left-4 right-4 h-24 z-50">
+          <div className="relative max-w-md mx-auto h-full">
+            <div className="absolute bottom-0 left-0 right-0 h-20 bg-white/80 backdrop-blur-xl border border-gray-200 rounded-3xl shadow-2xl">
+              <div className="flex justify-around items-center h-full">
+                {navItems.slice(0, 2).map(item => (
+                  <button key={item.id} onClick={() => setTab(item.id)} className="flex-1 flex flex-col items-center justify-center gap-1 h-full">
+                    <div className={`flex items-center gap-2 px-4 py-2 rounded-full transition-all duration-300 ${tab === item.id ? 'bg-blue-100' : 'bg-transparent'}`}>
+                      <item.icon size={24} className={tab === item.id ? 'text-blue-600' : 'text-gray-500'} />
+                      {tab === item.id && <span className="text-sm font-bold text-blue-600">{item.label}</span>}
+                    </div>
+                  </button>
+                ))}
+                <div className="w-20"></div>
+                {navItems.slice(2).map(item => (
+                  <button key={item.id} onClick={() => setTab(item.id)} className="flex-1 flex flex-col items-center justify-center gap-1 h-full">
+                    <div className={`flex items-center gap-2 px-4 py-2 rounded-full transition-all duration-300 ${tab === item.id ? 'bg-blue-100' : 'bg-transparent'}`}>
+                      <item.icon size={24} className={tab === item.id ? 'text-blue-600' : 'text-gray-500'} />
+                      {tab === item.id && <span className="text-sm font-bold text-blue-600">{item.label}</span>}
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
+            <button 
+              onClick={() => setShowCamera(true)} 
+              className="absolute left-1/2 -translate-x-1/2 -top-1/3 w-20 h-20 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center shadow-2xl border-4 border-white hover:scale-105 transition-transform"
+            >
+              <Camera size={32} className="text-white" />
             </button>
           </div>
         </div>
