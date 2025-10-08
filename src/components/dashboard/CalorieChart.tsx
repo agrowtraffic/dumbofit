@@ -9,7 +9,7 @@ interface CalorieChartProps {
 }
 
 const chartConfig = {
-  calories: { label: "Calorias", color: "hsl(var(--chart-2))" },
+  calories: { label: "Calorias", color: "hsl(var(--chart-4))" }, // Alterado para Esmeralda
 } satisfies ChartConfig;
 
 export const CalorieChart = ({ data }: CalorieChartProps) => {

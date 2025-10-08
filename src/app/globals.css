@@ -34,11 +34,12 @@
  
     --radius: 0.5rem;
 
-    --chart-1: 221 83% 53%;
-    --chart-2: 160 60% 45%;
-    --chart-3: 30 80% 55%;
-    --chart-4: 280 85% 60%;
-    --chart-5: 340 90% 65%;
+    /* Paleta de cores do App para Gráficos */
+    --chart-1: 221 83% 53%;   /* Azul */
+    --chart-2: 262 83% 58%;   /* Roxo */
+    --chart-3: 25 95% 53%;    /* Laranja */
+    --chart-4: 158 83% 38%;   /* Esmeralda */
+    --chart-5: 322 83% 58%;   /* Rosa */
   }
  
   .dark {
@@ -70,11 +71,12 @@
     --input: 217.2 32.6% 17.5%;
     --ring: 212.7 26.8% 83.9%;
 
-    --chart-1: 221 83% 63%;
-    --chart-2: 160 60% 55%;
-    --chart-3: 30 80% 65%;
-    --chart-4: 280 85% 70%;
-    --chart-5: 340 90% 75%;
+    /* Paleta de cores do App para Gráficos (Modo Escuro) */
+    --chart-1: 221 83% 63%;   /* Azul Claro */
+    --chart-2: 262 83% 68%;   /* Roxo Claro */
+    --chart-3: 25 95% 63%;    /* Laranja Claro */
+    --chart-4: 158 83% 48%;   /* Esmeralda Claro */
+    --chart-5: 322 83% 68%;   /* Rosa Claro */
   }
 }
  
