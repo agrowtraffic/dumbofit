@@ -31,30 +31,8 @@ import { type ChartConfig, ChartContainer, ChartLegend, ChartLegendContent, Char
 
 const Chart = ChartContainer
 
-const ChartWrapper = React.forwardRef<
-  HTMLDivElement,
-  React.ComponentProps<"div"> & {
-    config: ChartConfig
-    data: any[]
-  }
->(({ config, data, ...props }, ref) => {
-  const id = React.useId()
-
-  return (
-    <Chart
-      {...props}
-      ref={ref}
-      config={config}
-      id={id}
-      data={data}
-    />
-  )
-})
-ChartWrapper.displayName = "ChartWrapper"
-
 export {
   Chart,
-  ChartWrapper,
   // Re-export all recharts components
   Bar,
   BarChart,

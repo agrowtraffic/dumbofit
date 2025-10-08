@@ -4,6 +4,7 @@ import { Home, Camera, User, TrendingUp, BookOpen, Plus, Mail, Lock, Trophy, Fla
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { Auth } from '@supabase/auth-ui-react';
 import { ThemeSupa } from '@supabase/auth-ui-shared';
+import type { AuthChangeEvent, Session } from '@supabase/supabase-js';
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis, ResponsiveContainer } from 'recharts';
 import { ChartContainer, ChartTooltip, ChartTooltipContent, type ChartConfig } from '@/components/ui/chart';
 
@@ -42,7 +43,7 @@ export default function DumboFitApp() {
   const supabase = createClientComponentClient();
 
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event: AuthChangeEvent, session: Session | null) => {
       if (event === 'SIGNED_IN') {
         setScreen('quiz');
         setQuizStep(0);
