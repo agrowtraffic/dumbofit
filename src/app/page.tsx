@@ -86,7 +86,7 @@ export default function DumboFitApp() {
     })).reverse();
   }, [history]);
 
-  const KEY = 'YOUR_API_KEY'; // Substitua pela sua chave de API do Google AI
+  const KEY = process.env.NEXT_PUBLIC_GEMINI_API_KEY;
   
   const user = { 
     name: quizData.name || 'Ana Silva', 
@@ -186,6 +186,23 @@ export default function DumboFitApp() {
   ];
 
   const genRecipeAI = async (obj: string) => {
+    if (!KEY) {
+      console.error("Chave da API do Gemini não configurada.");
+      return { 
+        id: Date.now(), 
+        name: `Receita de Exemplo`, 
+        calories: 280, 
+        time: 20, 
+        difficulty: 'Fácil', 
+        servings: 2, 
+        obj, 
+        emoji: '🍽️', 
+        ingredients: ['Configure a chave da API', 'Para gerar receitas reais'], 
+        instructions: ['Vá para as configurações do app', 'Adicione a variável de ambiente NEXT_PUBLIC_GEMINI_API_KEY'], 
+        tips: 'Esta é uma receita de exemplo pois a API não está configurada.' 
+      };
+    }
+
     const o = objs.find(x => x.id === obj);
     const prompt = `Crie receita brasileira para ${o?.name}. Retorne JSON: {"name":"Nome da receita","calories":300,"time":25,"difficulty":"Fácil","servings":2,"ingredients":["ingrediente 1","ingrediente 2"],"instructions":["passo 1","passo 2"],"tips":"dica especial"}`;
     
