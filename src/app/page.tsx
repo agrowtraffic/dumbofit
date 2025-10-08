@@ -54,6 +54,37 @@ export default function DumboFitApp() {
     return () => subscription.unsubscribe();
   }, []);
 
+  useEffect(() => {
+    const today = new Date();
+    const yesterday = new Date(today);
+    yesterday.setDate(yesterday.getDate() - 1);
+    const twoDaysAgo = new Date(today);
+    twoDaysAgo.setDate(twoDaysAgo.getDate() - 2);
+
+    setHistory([
+      { id: 1, name: 'Salada Caesar Frango', cal: 420, prot: 28, date: today.toLocaleDateString('pt-BR'), time: '12:30', photo: '🥗' },
+      { id: 4, name: 'Iogurte com Frutas', cal: 250, prot: 15, date: today.toLocaleDateString('pt-BR'), time: '09:00', photo: '🍓' },
+      { id: 2, name: 'Smoothie Frutas', cal: 180, prot: 8, date: yesterday.toLocaleDateString('pt-BR'), time: '09:15', photo: '🥤' },
+      { id: 5, name: 'Frango Grelhado', cal: 600, prot: 45, date: yesterday.toLocaleDateString('pt-BR'), time: '20:00', photo: '🍗' },
+      { id: 3, name: 'Salmão Legumes', cal: 520, prot: 35, date: twoDaysAgo.toLocaleDateString('pt-BR'), time: '19:45', photo: '🐟' }
+    ]);
+  }, []);
+
+  const chartData = useMemo(() => {
+    const groupedData = history.reduce((acc, item) => {
+      const date = item.date;
+      if (!acc[date]) {
+        acc[date] = 0;
+      }
+      acc[date] += item.cal;
+      return acc;
+    }, {} as Record<string, number>);
+
+    return Object.keys(groupedData).map(date => ({
+      date: date.slice(0, 5), // "dd/mm"
+      calories: groupedData[date],
+    })).reverse();
+  }, [history]);
 
   const KEY = 'YOUR_API_KEY'; // Substitua pela sua chave de API do Google AI
   
@@ -153,22 +184,6 @@ export default function DumboFitApp() {
       icon: '🎯'
     }
   ];
-
-  useEffect(() => {
-    const today = new Date();
-    const yesterday = new Date(today);
-    yesterday.setDate(yesterday.getDate() - 1);
-    const twoDaysAgo = new Date(today);
-    twoDaysAgo.setDate(twoDaysAgo.getDate() - 2);
-
-    setHistory([
-      { id: 1, name: 'Salada Caesar Frango', cal: 420, prot: 28, date: today.toLocaleDateString('pt-BR'), time: '12:30', photo: '🥗' },
-      { id: 4, name: 'Iogurte com Frutas', cal: 250, prot: 15, date: today.toLocaleDateString('pt-BR'), time: '09:00', photo: '🍓' },
-      { id: 2, name: 'Smoothie Frutas', cal: 180, prot: 8, date: yesterday.toLocaleDateString('pt-BR'), time: '09:15', photo: '🥤' },
-      { id: 5, name: 'Frango Grelhado', cal: 600, prot: 45, date: yesterday.toLocaleDateString('pt-BR'), time: '20:00', photo: '🍗' },
-      { id: 3, name: 'Salmão Legumes', cal: 520, prot: 35, date: twoDaysAgo.toLocaleDateString('pt-BR'), time: '19:45', photo: '🐟' }
-    ]);
-  }, []);
 
   const genRecipeAI = async (obj: string) => {
     const o = objs.find(x => x.id === obj);
@@ -861,22 +876,6 @@ export default function DumboFitApp() {
   // Tela principal do app
   if (screen === 'app') {
     const imc = (user.weight / ((user.height/100) ** 2)).toFixed(1);
-    const chartData = useMemo(() => {
-      const groupedData = history.reduce((acc, item) => {
-        const date = item.date;
-        if (!acc[date]) {
-          acc[date] = 0;
-        }
-        acc[date] += item.cal;
-        return acc;
-      }, {} as Record<string, number>);
-
-      return Object.keys(groupedData).map(date => ({
-        date: date.slice(0, 5), // "dd/mm"
-        calories: groupedData[date],
-      })).reverse();
-    }, [history]);
-
     const chartConfig = {
       calories: {
         label: "Calorias",
