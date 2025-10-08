@@ -1122,8 +1122,10 @@ export default function DumboFitApp() {
           {tab === 'stats' && (
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
-                <StatCard title="Média de Calorias" value={((history.reduce((a, b) => a + b.cal, 0) / 5) || 0).toFixed(0)} icon={Flame} description="Média dos últimos 5 dias" />
-                <StatCard title="Variação de Peso" value={`${(weightHistory[weightHistory.length - 1]?.weight - weightHistory[0]?.weight).toFixed(1)} kg`} icon={Weight} description="Desde o início" />
+                <StatCard title="Média de Calorias" value={((history.reduce((a, b) => a + b.cal, 0) / 5) || 0).toFixed(0)} icon={Flame} description="Últimos 5 dias" />
+                <StatCard title="Variação de Peso" value={`${(weightHistory.length > 1 ? weightHistory[weightHistory.length - 1]?.weight - weightHistory[0]?.weight : 0).toFixed(1)} kg`} icon={Weight} description="Desde o início" />
+                <StatCard title="IMC" value={(user.weight / ((user.height/100) ** 2)).toFixed(1)} icon={Activity} description="Índice de Massa Corporal" />
+                <StatCard title="Sequência" value={`${user.streak} dias`} icon={Trophy} description="Registros consecutivos" />
               </div>
               <MacroChart data={macroData} />
               <WeightChart data={weightHistory} />
