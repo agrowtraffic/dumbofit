@@ -1,9 +1,11 @@
 "use client";
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Home, Camera, User, TrendingUp, BookOpen, Plus, Mail, Lock, Trophy, Flame, Crown, Zap, Bell, ChevronLeft, Settings, X, Moon, Sun, Share2, History, Users, Trash2, Clock } from 'lucide-react';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { Auth } from '@supabase/auth-ui-react';
 import { ThemeSupa } from '@supabase/auth-ui-shared';
+import { Bar, BarChart, CartesianGrid, XAxis, YAxis, ResponsiveContainer } from 'recharts';
+import { ChartContainer, ChartTooltip, ChartTooltipContent, type ChartConfig } from '@/components/ui/chart';
 
 export default function DumboFitApp() {
   const [screen, setScreen] = useState('welcome');
@@ -12,7 +14,6 @@ export default function DumboFitApp() {
   const [showAnalysis, setShowAnalysis] = useState(false);
   const [showReward, setShowReward] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [showProfile, setShowProfile] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [notifications, setNotifications] = useState(true);
   const [showRecipeGen, setShowRecipeGen] = useState(false);
@@ -155,10 +156,18 @@ export default function DumboFitApp() {
   ];
 
   useEffect(() => {
+    const today = new Date();
+    const yesterday = new Date(today);
+    yesterday.setDate(yesterday.getDate() - 1);
+    const twoDaysAgo = new Date(today);
+    twoDaysAgo.setDate(twoDaysAgo.getDate() - 2);
+
     setHistory([
-      { id: 1, name: 'Salada Caesar Frango', cal: 420, prot: 28, date: new Date(Date.now() - 86400000).toLocaleDateString('pt-BR'), time: '12:30', photo: '🥗' },
-      { id: 2, name: 'Smoothie Frutas', cal: 180, prot: 8, date: new Date(Date.now() - 172800000).toLocaleDateString('pt-BR'), time: '09:15', photo: '🥤' },
-      { id: 3, name: 'Salmão Legumes', cal: 520, prot: 35, date: new Date(Date.now() - 259200000).toLocaleDateString('pt-BR'), time: '19:45', photo: '🐟' }
+      { id: 1, name: 'Salada Caesar Frango', cal: 420, prot: 28, date: today.toLocaleDateString('pt-BR'), time: '12:30', photo: '🥗' },
+      { id: 4, name: 'Iogurte com Frutas', cal: 250, prot: 15, date: today.toLocaleDateString('pt-BR'), time: '09:00', photo: '🍓' },
+      { id: 2, name: 'Smoothie Frutas', cal: 180, prot: 8, date: yesterday.toLocaleDateString('pt-BR'), time: '09:15', photo: '🥤' },
+      { id: 5, name: 'Frango Grelhado', cal: 600, prot: 45, date: yesterday.toLocaleDateString('pt-BR'), time: '20:00', photo: '🍗' },
+      { id: 3, name: 'Salmão Legumes', cal: 520, prot: 35, date: twoDaysAgo.toLocaleDateString('pt-BR'), time: '19:45', photo: '🐟' }
     ]);
   }, []);
 
@@ -850,91 +859,32 @@ export default function DumboFitApp() {
     );
   }
 
-  if (showProfile) {
-    const imc = (user.weight / ((user.height/100) ** 2)).toFixed(1);
-    
-    return (
-      <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 overflow-y-auto">
-        <div className={`min-h-screen ${bg} p-4`}>
-          <div className="max-w-2xl mx-auto py-6">
-            <button 
-              onClick={() => setShowProfile(false)} 
-              className="mb-4 flex items-center text-gray-600 hover:text-gray-900 transition-colors"
-            >
-              <ChevronLeft size={20} className="mr-1" />
-              Voltar
-            </button>
-            
-            <div className={`${card} rounded-3xl p-6 shadow-xl mb-4`}>
-              <div className="text-center mb-6">
-                <div className="w-24 h-24 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-xl">
-                  <User size={48} className="text-white" />
-                </div>
-                <h1 className={`text-3xl font-black ${txt} mb-2`}>{user.name}</h1>
-                <p className={`${txt2}`}>Membro desde {user.date}</p>
-              </div>
-              
-              <div className="grid grid-cols-3 gap-4 mb-6">
-                <div className="text-center">
-                  <div className="bg-gradient-to-br from-blue-100 to-blue-200 p-4 rounded-2xl mb-2">
-                    <Trophy className="text-blue-600 mx-auto mb-1" size={24} />
-                    <p className="text-2xl font-black text-blue-600">{user.level}</p>
-                  </div>
-                  <p className={`text-sm ${txt2}`}>Nível</p>
-                </div>
-                
-                <div className="text-center">
-                  <div className="bg-gradient-to-br from-orange-100 to-orange-200 p-4 rounded-2xl mb-2">
-                    <Flame className="text-orange-600 mx-auto mb-1" size={24} />
-                    <p className="text-2xl font-black text-orange-600">{user.streak}</p>
-                  </div>
-                  <p className={`text-sm ${txt2}`}>Sequência</p>
-                </div>
-                
-                <div className="text-center">
-                  <div className="bg-gradient-to-br from-purple-100 to-purple-200 p-4 rounded-2xl mb-2">
-                    <Crown className="text-purple-600 mx-auto mb-1" size={24} />
-                    <p className="text-2xl font-black text-purple-600">{user.badges}</p>
-                  </div>
-                  <p className={`text-sm ${txt2}`}>Conquistas</p>
-                </div>
-              </div>
-              
-              <div className="space-y-4 mb-6">
-                <div className="flex justify-between items-center">
-                  <span className={txt2}>Peso atual</span>
-                  <span className={`font-bold ${txt}`}>{user.weight} kg</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className={txt2}>Altura</span>
-                  <span className={`font-bold ${txt}`}>{user.height} cm</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className={txt2}>IMC</span>
-                  <span className={`font-bold ${txt}`}>{imc}</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className={txt2}>Refeições registradas</span>
-                  <span className={`font-bold ${txt}`}>{user.meals}</span>
-                </div>
-              </div>
-              
-              <button 
-                onClick={() => setShowSettings(true)} 
-                className="w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white py-4 rounded-2xl font-bold shadow-lg hover:scale-105 transition-all flex items-center justify-center gap-2"
-              >
-                <Settings size={20} />
-                Configurações
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   // Tela principal do app
   if (screen === 'app') {
+    const imc = (user.weight / ((user.height/100) ** 2)).toFixed(1);
+    const chartData = useMemo(() => {
+      const groupedData = history.reduce((acc, item) => {
+        const date = item.date;
+        if (!acc[date]) {
+          acc[date] = 0;
+        }
+        acc[date] += item.cal;
+        return acc;
+      }, {} as Record<string, number>);
+
+      return Object.keys(groupedData).map(date => ({
+        date: date.slice(0, 5), // "dd/mm"
+        calories: groupedData[date],
+      })).reverse();
+    }, [history]);
+
+    const chartConfig = {
+      calories: {
+        label: "Calorias",
+        color: "hsl(221.2 83.2% 53.3%)",
+      },
+    } satisfies ChartConfig;
+
     return (
       <div className={`min-h-screen ${bg} pb-24`}>
         {/* Header */}
@@ -944,7 +894,7 @@ export default function DumboFitApp() {
               <h1 className={`text-2xl font-black ${txt}`}>Olá, {user.name}!</h1>
               <p className={txt2}>Vamos conquistar hoje 🔥</p>
             </div>
-            <button onClick={() => setShowProfile(true)} className="relative">
+            <button onClick={() => setTab('profile')} className="relative">
               <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center shadow-lg">
                 <User size={24} className="text-white" />
               </div>
